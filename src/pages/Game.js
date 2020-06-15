@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyledGame,
   StyledTimer,
@@ -9,11 +9,14 @@ import { Strong } from '../styled/Random';
 
 function Game({ history }) {
   const MAX_SECONDS = 90;
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
   const [score, setScore] = useState(0);
   const [seconds, setSeconds] = useState(MAX_SECONDS);
   const [ms, setMs] = useState(0);
+  const [character, setCharacter] = useState('');
 
   useEffect(() => {
+    setRandomCharacter();
     const currentTime = new Date();
     const interval = setInterval(() => updateTime(currentTime), 1);
 
@@ -28,16 +31,33 @@ function Game({ history }) {
     }
   }, [seconds, history]);
 
+  const keyupHandler = useCallback(
+    (e) => {
+      if (e.key === character) {
+        setScore((prevScore) => prevScore + 1);
+      } else {
+        if (score > 0) {
+          setScore((prevScore) => prevScore - 1);
+        }
+      }
+
+      setRandomCharacter();
+    },
+    [character, score]
+  );
+
   useEffect(() => {
     document.addEventListener('keyup', keyupHandler);
 
     return () => {
       document.removeEventListener('keyup', keyupHandler);
     };
-  }, []);
+  }, [keyupHandler]);
 
-  const keyupHandler = (e) => {
-    console.log(e.key);
+  const setRandomCharacter = () => {
+    const randomInt = Math.floor(Math.random() * 36);
+    const character = characters[randomInt];
+    setCharacter(character);
   };
 
   const updateTime = (startTime) => {
@@ -59,7 +79,7 @@ function Game({ history }) {
       <StyledScore>
         Score: <Strong>{score}</Strong>
       </StyledScore>
-      <StyledCharacter>A</StyledCharacter>
+      <StyledCharacter>{character}</StyledCharacter>
       <StyledTimer>
         Time:{' '}
         <Strong>
