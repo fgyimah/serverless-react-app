@@ -8,7 +8,7 @@ import {
 import { Strong } from '../styled/Random';
 
 function Game({ history }) {
-  const MAX_SECONDS = 5;
+  const MAX_SECONDS = 90;
   const [score, setScore] = useState(0);
   const [seconds, setSeconds] = useState(MAX_SECONDS);
   const [ms, setMs] = useState(0);
@@ -27,6 +27,18 @@ function Game({ history }) {
       history.push('/gameOver');
     }
   }, [seconds, history]);
+
+  useEffect(() => {
+    document.addEventListener('keyup', keyupHandler);
+
+    return () => {
+      document.removeEventListener('keyup', keyupHandler);
+    };
+  }, []);
+
+  const keyupHandler = (e) => {
+    console.log(e.key);
+  };
 
   const updateTime = (startTime) => {
     const endTime = new Date();
