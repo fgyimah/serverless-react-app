@@ -27,7 +27,7 @@ exports.handler = async (event, context) => {
     console.error(error);
     return {
       statusCode: 500,
-      body: JSON.stringify(error),
+      body: JSON.stringify({ error: 'Failed to load records' }),
     };
   }
 };
