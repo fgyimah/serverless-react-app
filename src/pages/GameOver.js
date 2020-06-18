@@ -35,10 +35,14 @@ function GameOver({ history }) {
   return (
     <div>
       <h1>GameOver</h1>
+      <h2>{scoreMessage}</h2>
       <StyledCharacter>{score}</StyledCharacter>
-      <p>{scoreMessage}</p>
-      <StyledLink to="/">Go home</StyledLink>
-      <StyledLink to="/game">Play Again?</StyledLink>
+      <div>
+        <StyledLink to="/">Go home</StyledLink>
+      </div>
+      <div>
+        <StyledLink to="/game">Play Again?</StyledLink>
+      </div>
     </div>
   );
 }
