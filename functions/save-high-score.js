@@ -1,47 +1,34 @@
-const table = require('./utils/airtable');
+const { table, getHighScores } = require('./utils/airtable');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return {
-      statusCode: 400,
-      body: JSON.stringify({ err: 'Method not Allowed!' }),
+      statusCode: 405,
+      body: JSON.stringify({ err: 'That method is not allowed' }),
     };
   }
 
   const { score, name } = JSON.parse(event.body);
-
-  if (typeof score === 'undefined' || !score || !name) {
+  if (typeof score === 'undefined' || !name) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ err: 'Bad Request!' }),
+      body: JSON.stringify({ err: 'Bad request' }),
     };
   }
 
   try {
-    const records = await table
-      .select({
-        sort: [{ field: 'score', direction: 'desc' }],
-      })
-      .firstPage();
-    const formattedRecords = records.map((record) => ({
-      id: record.id,
-      fields: record.fields,
-    }));
+    const records = await getHighScores(false);
 
-    const lowest = formattedRecords[9];
-
+    const lowestRecord = records[9];
     if (
-      typeof lowest.fields.score === 'undefined' ||
-      score > lowest.fields.score
+      typeof lowestRecord.fields.score === 'undefined' ||
+      score > lowestRecord.fields.score
     ) {
+      //update this record with the incoming score
       const updatedRecord = {
-        id: lowest.id,
-        fields: {
-          score,
-          name,
-        },
+        id: lowestRecord.id,
+        fields: { name, score },
       };
-
       await table.update([updatedRecord]);
       return {
         statusCode: 200,
